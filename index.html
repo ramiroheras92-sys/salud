@@ -35,7 +35,7 @@ label[for]{display:block;margin:14px 0 8px}
 .row{display:flex;align-items:center;gap:12px;margin:12px 0;font-size:1.7rem}.row b{width:34%;font-weight:400}
 .row i{display:block;height:30px;background:repeating-linear-gradient(90deg,var(--ac) 0 12px,transparent 12px 16px)}.row.w i{background:repeating-linear-gradient(90deg,var(--p) 0 12px,transparent 12px 16px)}.row.w b{color:var(--p)}
 body.t main{max-width:1000px}
-</style></head><body><main id="app"></main>
+select{font:26px VT323,monospace;padding:8px;border:4px solid #000;box-shadow:0 0 0 4px var(--ed);width:100%;background:#0a0c1c;color:var(--p)}</style></head><body><main id="app"></main>
 <script>
 const $=s=>document.querySelector(s),app=h=>{$('#app').innerHTML=h;scrollTo(0,0)};
 const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -71,7 +71,7 @@ const Q=[
 {q:'¿Qué derechos fueron vulnerados?',m:1,o:[['Derecho a la salud (Declaración Universal art. 25 y Convención sobre los Derechos del Niño art. 24, con jerarquía constitucional por el art. 75 inc. 22)',2],['Derecho a un ambiente sano (Constitución Nacional, art. 41)',2],['Derecho a la salud en la Constitución bonaerense (art. 36 inc. 8)',2],['Derecho a la huelga',-2],['Derecho del Estado a que cada familia se haga cargo sola de la salud de sus hijos',-2]],e:'Los tres primeros son correctos. La huelga no tiene relación con el caso. Y el último derecho no existe: el Estado no tiene ningún derecho a descargar su responsabilidad en las familias; tiene la obligación de garantizar el acceso a la salud. Los padres tienen deberes de cuidado, pero eso no reemplaza el deber del Estado, que además debe asistirlos.'},
 {q:'¿Quién es el primer responsable de garantizar el derecho a la salud?',o:[['La familia de Tomás',0],['El propio Tomás',0],['El mercado',0],['El Estado, en sus niveles nacional, provincial y municipal',10]],e:'El Estado es el garante principal. Durante mucho tiempo se pensó la salud como un asunto individual; hoy la Constitución y los tratados dicen que el Estado debe garantizarla.'},
 {q:'¿Qué consecuencias tiene la falta de acceso a la salud?',m:1,o:[['Se llega más tarde y más grave',1],['Se enferman personas por causas evitables',1],['Aumenta la desigualdad entre barrios y familias',1],['El hospital recibe casos más graves y se sobrecarga',1],['Ninguna, porque la salud es un tema individual',-1]],e:'Las cuatro primeras son consecuencias del caso. La falta de acceso afecta a toda la comunidad, no solo a una familia.'}];
-const MAX=64,S={};
+const MAX=99,S={};
 const ck=(n,s)=>{let h=0;for(const c of n+s)h=(h*31+c.charCodeAt(0))%26;return String.fromCharCode(65+h)};
 const clean=n=>n.toUpperCase().replace(/[^A-Z0-9ÁÉÍÓÚÑ ]/g,'').trim().slice(0,16);
 
@@ -81,16 +81,16 @@ function home(){app(`<p class=k>Expediente Las Retamas · Construcción de la Ci
 <p>En cada pista hay un documento y cuatro afirmaciones. Clasifiquen cada una:</p>
 <p><b class=ok>Prueba</b>: está comprobada en el documento.<br><b style="color:var(--i)">Indicio</b>: es posible o viene de un relato, pero no está comprobada.<br><b class=no>Sin respaldo</b>: no hay dato que la sostenga o el documento la contradice.</p>
 <p>Un solo celular por grupo: discutan antes de elegir.</p>
-<label for=gn>Nombre del grupo</label><input type=text id=gn maxlength=16 autocomplete=off>
+<label for=gn>Nombre del grupo</label><input type=text id=gn maxlength=16 autocomplete=off><label for=rl>Rol que les asignó el docente</label><select id=rl><option value="">Elegir rol</option>${R.map((r,i)=>`<option value=${i}>${r[0]}</option>`).join('')}</select>
 <button class=btn id=go>Empezar la investigación</button>`);
-$('#go').onclick=()=>{const n=clean($('#gn').value);if(!n){$('#gn').focus();return}S.n=n;S.pp=[];pista(0)}}
+$('#go').onclick=()=>{const n=clean($('#gn').value),r=$('#rl').value;if(!n){$('#gn').focus();return}if(r===''){$('#rl').focus();return}S.n=n;S.r=+r;S.pp=[];S.kp=[0,0,0,0];S.q=0;S.c=0;pista(0)}}
 
 function pista(n){const p=P[n];
 app(`<div class=pg>${P.map((_,i)=>`<i class="${i<=n?'on':''}"></i>`).join('')}</div><p class=k>Pista ${n+1} de ${P.length}</p><h2>${p.t}</h2><div class=doc>${p.d}</div>${p.img?`<figure><img src="${p.img}" alt="Sala de primeros auxilios abandonada"><figcaption>Imagen ilustrativa</figcaption></figure>`:''}
 ${p.a.map((a,j)=>`<div class=af><p>${a[0]}</p><div class=ops>${['p','i','s'].map(k=>`<label><input type=radio name=a${j} value=${k}><span>${L[k]}</span></label>`).join('')}</div><p class=fb id=f${j}></p></div>`).join('')}
 <button class=btn id=ok>Confirmar pista</button>`);
 let done=0;$('#ok').onclick=()=>{
-if(done){n<P.length-1?pista(n+1):concl();return}
+if(done){n<P.length-1?pista(n+1):ronda();return}
 const v=p.a.map((a,j)=>{const c=document.querySelector(`input[name=a${j}]:checked`);return c&&c.value});
 if(v.includes(null)||v.includes(undefined)){$('#ok').textContent='Falta clasificar alguna afirmación';return}
 let t=0;p.a.forEach((a,j)=>{const g=v[j]==a[1]?2:(v[j]!='s'&&a[1]!='s'?1:0);t+=g;
@@ -98,16 +98,45 @@ $('#f'+j).innerHTML=`<b class="${g==2?'ok':'no'}">${g==2?'Correcto':g?'Casi: era
 document.querySelectorAll('input').forEach(i=>i.disabled=true);S.pp[n]=t;done=1;
 $('#ok').textContent=n<P.length-1?'Siguiente pista':'Ir a la conclusión'}}
 
-function concl(){app(`<p class=k>Conclusión</p><h2>Armen el informe final</h2><p>Pueden marcar más de una opción cuando la pregunta lo indica.</p>
-${Q.map((q,i)=>`<div class="af q"><p>${q.q}</p>${q.o.map((o,j)=>`<label><input type=${q.m?'checkbox':'radio'} name=q${i} value=${j}>${o[0]}</label>`).join('')}<p class=fb id=e${i}></p></div>`).join('')}
-<button class=btn id=ok>Entregar el informe</button>`);
-$('#ok').onclick=()=>{let t=0,pc=[];Q.forEach((q,i)=>{let s=0;document.querySelectorAll(`input[name=q${i}]:checked`).forEach(c=>s+=q.o[c.value][1]);s=Math.max(0,s);pc.push(s);t+=s;$('#e'+i).innerHTML=`<b>+${s} puntos.</b> ${q.e}`});
-S.c=pc;S.t=S.pp.reduce((a,b)=>a+b,0)+t;document.querySelectorAll('input').forEach(i=>i.disabled=true);
-$('#ok').textContent='Ver resultado';$('#ok').onclick=fin}}
-
-function fin(){const c=`${S.n}-${S.t}-${ck(S.n,S.t)}`;
+const R=[
+['La madre','Fui a la salita dos veces en tres semanas por la tos de Tomás. La primera vez llegué a las 7:30 y ya no quedaban turnos; la segunda, ese día no atendía el médico. Ir al pediatra implica dos colectivos y perder el día de changa.'],
+['La enfermera de la salita','Hace dos semanas vi a Tomás y le dije a la madre que lo viera un pediatra. Pero acá no hay pediatra, no tenemos sistema de derivación ni forma de hacer seguimiento: si no vuelven, no nos enteramos.'],
+['Una vecina','Desde que cerró la vieja sala de primeros auxilios, cuando llamamos a una ambulancia tarda más de una hora en llegar al barrio.'],
+['La funcionaria municipal','Recibimos los pedidos del barrio. Pero contratar un pediatra depende de presupuesto provincial, y la Provincia dice que lo tiene que pedir el municipio. Nadie tomó la decisión.'],
+['La trabajadora social','Cada invierno llegan a la guardia casos parecidos al de Tomás, de chicos de Las Retamas. No es un caso aislado.'],
+['El pediatra del hospital','Una neumonía atendida a tiempo suele tratarse sin internación. Tomás llegó con la enfermedad muy avanzada.']];
+const CR=[
+['¿Intentó la madre llevar antes a Tomás?',['No, no se preocupó','Sí, dos veces en tres semanas y no consiguió turno','Sí, pero no quiso esperar'],1],
+['¿Qué pasó cuando la enfermera indicó ver a un pediatra?',['La familia no fue','La salita no tiene pediatra ni sistema de derivación ni seguimiento','El pediatra no tenía turno'],1],
+['¿Cuánto tarda una ambulancia en llegar al barrio?',['Unos 10 minutos','Alrededor de media hora','Más de una hora'],2],
+['¿Qué pasó con el pedido de un pediatra fijo?',['Se descartó por innecesario','Dependía de otro nivel del Estado y nadie decidió','Ya estaba en camino'],1],
+['¿Es el de Tomás un caso aislado?',['Sí, es la primera vez','No, cada invierno llegan casos parecidos del barrio','No hay datos'],1],
+['¿Qué habría cambiado una atención a tiempo?',['Nada','Una neumonía así suele tratarse sin internación','Habría necesitado cirugía'],1]];
+const K=[
+['¿Qué artículo de la Constitución de la Provincia de Buenos Aires reconoce el derecho a la salud?',['36'],'Buscalo en el módulo, en el apartado Derecho a la salud.','Art. 36 inc. 8: la Provincia garantiza a todos sus habitantes el acceso a la salud (preventivo, asistencial y terapéutico), sostiene el hospital público y gratuito y promueve la educación para la salud.'],
+['¿Qué artículo de la Convención sobre los Derechos del Niño reconoce el más alto nivel posible de salud?',['24'],'Buscalo en el módulo, en el apartado Derecho a la salud.','Art. 24: los Estados reconocen el derecho del niño al más alto nivel posible de salud, con atención primaria, combate de la malnutrición con alimentos nutritivos y agua potable, y prevención.'],
+['Completá el art. 41 de la Constitución Nacional: «Todos los habitantes gozan del derecho a un ambiente sano, ______, apto para el desarrollo humano».',['EQUILIBRADO'],'Está en el módulo, en el apartado Derecho a la salud.','Un ambiente sano es una garantía del derecho a la salud. Además, desde 1994 el art. 75 inc. 22 incorpora tratados como la Declaración Universal (art. 25) y la Convención sobre los Derechos del Niño.'],
+['Buscá en internet la ley nacional de protección integral de los derechos de niñas, niños y adolescentes. Completá: el Estado debe garantizar campañas permanentes de difusión y programas de educación ______.',['SANITARIA'],'Buscá el artículo sobre el derecho a la salud de esa ley.','Los organismos del Estado deben garantizar el acceso a los servicios de salud, programas de asistencia a las familias y educación sanitaria. El garante es el Estado.']];
+const A={q:'Según estas normas, ¿cómo debería haber actuado el Estado antes de que Tomás llegara grave?',m:1,o:[['Garantizar controles y atención primaria cerca del barrio',1],['Asegurar agua potable en el barrio',1],['Sumar pediatra y ambulancia',1],['Acompañar a la familia con asistencia y educación para la salud',1],['Esperar a que cada familia lleve a los chicos al hospital',-1],['Que cada familia busque atención privada',-1]],e:'Las cuatro primeras son obligaciones del Estado según las normas que acaban de leer. Las otras dos trasladan la responsabilidad a las familias.'};
+const H={q:'¿Cómo debería haber actuado el hospital?',m:1,o:[['Atenderlo sin cobrar, por ser un hospital público y gratuito',1],['Articular con la salita y el barrio para el seguimiento',1],['Dar educación para la salud a la familia',1],['Culpar a la madre y derivarla a una clínica privada',-1],['Dar el alta apenas mejore, sin seguimiento',-1]],e:'El hospital público es gratuito y también tiene funciones de asistencia y educación para la salud. Culpar a la familia o cortar el seguimiento deja el problema sin resolver.'};
+const F={q:'¿Qué falencias tuvo el Estado?',m:1,o:[['La salita no tiene pediatra, atiende pocas mañanas y no hay derivación ni seguimiento',2],['El barrio no tiene agua potable y la ambulancia tarda más de una hora',2],['Los pedidos del barrio no tuvieron respuesta y los niveles del Estado se pasan la responsabilidad',2],['No hay acompañamiento para una familia sin contrato ni obra social',2],['La familia no supo cuidar a su hijo',-2],['El hospital le cobró la consulta',-2]],e:'Las cuatro primeras surgen de las pistas y de los testimonios. Las otras no tienen respaldo: culpar a la familia o inventar un cobro no explica lo que pasó.'};
+const I=[[A,H],[Q[0]],[Q[1]],[F,Q[2]]];
+const nz=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+const lock=()=>document.querySelectorAll('input').forEach(i=>i.disabled=true);
+function ronda(){app(`<p class=k>Ronda de testimonios</p><h2>${R[S.r][0]}</h2><div class=doc>${R[S.r][1]}</div><p>Este testimonio es solo de ustedes: no muestren la pantalla. Cuéntenlo en voz alta a los demás grupos y averigüen los otros cinco hablando con ellos.</p><button class=btn id=ok>Ya hablamos con todos</button>`);$('#ok').onclick=cruce}
+function cruce(){app(`<p class=k>Preguntas de cruce</p><h2>¿Qué dijeron los testigos?</h2>${CR.map((c,i)=>`<div class="af q"><p>${c[0]}</p>${c[1].map((o,j)=>`<label><input type=radio name=c${i} value=${j}>${o}</label>`).join('')}<p class=fb id=c${i}></p></div>`).join('')}<button class=btn id=ok>Confirmar respuestas</button>`);
+let d=0;$('#ok').onclick=()=>{if(d){etapa(0);return}S.c=0;CR.forEach((c,i)=>{const v=document.querySelector(`input[name=c${i}]:checked`),g=v&&+v.value==c[2];if(g)S.c+=2;$('#c'+i).innerHTML=g?'<b class=ok>Correcto (+2).</b>':'<b class=no>Era: '+c[1][c[2]]+'.</b>'});lock();d=1;$('#ok').textContent='Continuar'}}
+function etapa(i){if(i==4){blk([Q[3]],fin,'Cierre');return}llave(i,()=>blk(I[i],()=>etapa(i+1),'Instancia '+(i+1)+' de 4'))}
+function llave(i,nx){const k=K[i];let n=0;
+app(`<p class=k>Llave ${i+1} de 4</p><h2>Consigan la norma</h2><div class=doc>${k[0]}</div><input type=text id=ky autocomplete=off><p class=fb id=kf></p><button class=btn id=ok>Probar llave</button>`);
+$('#ok').onclick=()=>{if(n<0){nx();return}const a=nz($('#ky').value),f=$('#kf');if(!a)return;n++;const ok=k[1].includes(a);
+if(ok||n>=3){S.kp[i]=ok?(n==1?2:n==2?1:0):0;f.innerHTML=(ok?`<b class=ok>Llave abierta (+${S.kp[i]}).</b>`:`<b class=no>Se agotaron los intentos (+0). La respuesta era ${k[1][0].toLowerCase()}.</b>`)+`<br>Lo que dice la norma: ${k[3]}`;$('#ky').disabled=true;$('#ok').textContent='Abrir la instancia';n=-1}
+else f.innerHTML=`<b class=no>No es esa. Intento ${n} de 3.</b> ${n>1?k[2]:''}`}}
+function blk(qs,nx,tt){app(`<p class=k>${tt}</p><h2>Respondan con lo que aprendieron</h2>${qs.map((q,i)=>`<div class="af q"><p>${q.q}</p>${q.o.map((o,j)=>`<label><input type=${q.m?'checkbox':'radio'} name=q${i} value=${j}>${o[0]}</label>`).join('')}<p class=fb id=e${i}></p></div>`).join('')}<button class=btn id=ok>Confirmar respuestas</button>`);
+let d=0;$('#ok').onclick=()=>{if(d){nx();return}qs.forEach((q,i)=>{let s=0;document.querySelectorAll(`input[name=q${i}]:checked`).forEach(c=>s+=q.o[c.value][1]);s=Math.max(0,s);S.q+=s;$('#e'+i).innerHTML=`<b>+${s} puntos.</b> ${q.e}`});lock();d=1;$('#ok').textContent='Continuar'}}
+function fin(){const a=S.pp.reduce((x,y)=>x+y,0),b=S.kp.reduce((x,y)=>x+y,0);S.t=a+b+S.c+S.q;const c=`${S.n}-${S.t}-${ck(S.n,S.t)}`;
 app(`<p class=k>Grupo ${esc(S.n)}</p><h2>Informe entregado</h2><p class=big>${S.t}<span class=k> / ${MAX} puntos</span></p>
-<p>Pistas: ${S.pp.reduce((a,b)=>a+b,0)} de 40 · Conclusión: ${S.t-S.pp.reduce((a,b)=>a+b,0)} de 24</p>
+<p>Pistas: ${a} de 40 · Llaves: ${b} de 8 · Testimonios: ${S.c} de 12 · Instancias: ${S.q} de 39</p>
 <p>Entreguen este código al docente:</p><div class=code>${esc(c)}</div>`)}
 
 /* Panel docente: abrir index.html#docente */
@@ -122,7 +151,7 @@ const G={};
 function docente(){document.body.classList.add('t');let k=0,tm;
 const lst=()=>{if(Object.keys(G).length)$('#ls').textContent='Cargados ('+Object.keys(G).length+'): '+Object.keys(G).join(', ')};
 app(`<h1>Panel docente</h1><form id=fm style="display:flex;gap:12px;align-items:center"><input type=text id=cd placeholder="NOMBRE-52-K" autocomplete=off autocapitalize=characters><button class=btn style="margin:0">Cargar</button></form>
-<p id=st class=k>Escriban el código de cada grupo y presionen Cargar.</p><p id=ls></p><button class=btn id=res>Mostrar resultados</button><div class=sl id=sl></div>`);lst();
+<p id=st class=k>Escriban el código de cada grupo y presionen Cargar.</p><p id=ls></p><div class=doc style="font-size:21px">Roles para repartir: ${R.map((r,i)=>(i+1)+". "+r[0]).join(" · ")}</div><button class=btn id=res>Mostrar resultados</button><div class=sl id=sl></div>`);lst();
 const show=()=>{const s=SL[k%SL.length];$('#sl').innerHTML=`<h2>${s[0]}</h2><p>${s[1]}</p>${s[2]?`<img src="${s[2]}" alt="">`:''}`;k++};
 show();tm=setInterval(show,14000);
 $('#fm').onsubmit=e=>{e.preventDefault();const st=$('#st'),m=$('#cd').value.toUpperCase().replace(/[\u2010-\u2015\u2212]/g,'-').replace(/\s*-\s*/g,'-').trim().match(/^(.+)-(\d+)-([A-Z])$/);
