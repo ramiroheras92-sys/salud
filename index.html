@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>El caso de la salita</title>
+<style>
+:root{--bg:#e8eef0;--ink:#14232e;--mut:#51636f;--ac:#0e6b73;--p:#1f7a4d;--i:#b7791f;--s:#a23b3b;--card:#fff;--ln:#c5d2d8}
+@media(prefers-color-scheme:dark){:root{--bg:#10191f;--ink:#e6eef1;--mut:#9db0ba;--ac:#58b8c0;--p:#5fc38c;--i:#e0a84a;--s:#e07a7a;--card:#18252d;--ln:#2b3b45}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:720px;margin:0 auto;padding:20px 16px 60px}
+h1,h2{font-family:Charter,"Iowan Old Style",Georgia,serif;line-height:1.15;margin:.2em 0 .5em}
+h1{font-size:2.3rem}h2{font-size:1.6rem}
+.k{color:var(--mut);margin:0;font-size:.9rem}
+.doc{background:var(--card);border-left:5px solid var(--ac);padding:14px 16px;font-family:Charter,"Iowan Old Style",Georgia,serif;margin:12px 0}
+figure{margin:12px 0}img{max-width:100%;border-radius:4px;display:block}figcaption{color:var(--mut);font-size:.85rem}
+.af{background:var(--card);border:1px solid var(--ln);padding:12px;margin:12px 0}
+.af>p:first-child{margin:0 0 8px;font-weight:600}
+.ops{display:flex;gap:6px;flex-wrap:wrap}
+.ops label{flex:1;min-width:92px}
+.ops input{position:absolute;opacity:0}
+.ops span{display:block;text-align:center;padding:9px 6px;border:2px solid var(--ln);border-radius:4px;cursor:pointer;font-weight:600}
+.ops input:checked+span{color:#fff}
+input[value=p]:checked+span{background:var(--p);border-color:var(--p)}
+input[value=i]:checked+span{background:var(--i);border-color:var(--i)}
+input[value=s]:checked+span{background:var(--s);border-color:var(--s)}
+.ops input:focus-visible+span{outline:3px solid var(--ac);outline-offset:2px}
+.fb{margin:8px 0 0;font-size:.95rem}.ok{color:var(--p)}.no{color:var(--s)}
+.btn{background:var(--ac);color:#fff;border:0;padding:13px 22px;font:inherit;font-weight:700;border-radius:4px;cursor:pointer;margin-top:10px}
+.btn:disabled{opacity:.5}.btn.alt{background:none;color:var(--ac);border:2px solid var(--ac)}
+input[type=text]{font:inherit;padding:11px;border:2px solid var(--ln);border-radius:4px;width:100%;background:var(--card);color:var(--ink)}
+.q label{display:block;padding:8px 0;cursor:pointer}.q input{margin-right:8px;transform:scale(1.2)}
+.big{font-family:Charter,Georgia,serif;font-size:3.4rem;margin:0}
+.code{font:700 1.5rem ui-monospace,monospace;background:var(--card);border:2px dashed var(--ac);padding:12px;text-align:center;margin:12px 0;word-break:break-all}
+.sl{min-height:44vh;display:flex;flex-direction:column;justify-content:center;background:var(--card);border-left:8px solid var(--ac);padding:24px 28px}
+.sl h2{font-size:3rem}.sl p{font-size:1.7rem;margin:0;font-family:Charter,Georgia,serif}.sl img{max-height:34vh;margin-top:10px;width:auto}
+.row{display:flex;align-items:center;gap:10px;margin:8px 0;font-size:1.3rem}.row b{width:34%}.row i{display:block;height:28px;background:var(--ac);border-radius:3px}.row.w i{background:var(--p)}
+body.t main{max-width:1000px}
+</style></head><body><main id="app"></main>
+<script>
+const $=s=>document.querySelector(s),app=h=>{$('#app').innerHTML=h;scrollTo(0,0)};
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const L={p:'Prueba',i:'Indicio',s:'Sin respaldo'};
+const P=[
+{t:'La historia clínica',d:'Ficha de ingreso a guardia. Paciente: Tomás, 9 años. Diagnóstico: neumonía avanzada. Peso: por debajo del esperado para su edad. Relato de la madre: tos desde hace unas tres semanas. Observación: sin controles de salud registrados en el último año.',a:[
+['Tomás ingresó con neumonía avanzada y bajo peso para su edad.','p','Figura en el diagnóstico médico.'],
+['La tos empezó hace unas tres semanas.','i','Surge del relato de la madre: es un dato referido, no comprobado por un estudio.'],
+['No hay controles de salud registrados en el último año.','p','Está anotado en la ficha.'],
+['Si la mamá lo hubiera llevado antes, no habría pasado nada.','s','Nadie puede asegurarlo, y todavía no sabemos si la familia podía llevarlo. Culpar sin pruebas no es investigar.']]},
+{t:'El barrio y la distancia',d:'Cartel de la salita de Las Retamas: atiende lunes, miércoles y viernes por la mañana, con una enfermera y un médico clínico. No hay pediatra. Los turnos se entregan a las 7 y se agotan rápido. Recorrido oficial al pediatra más cercano: dos colectivos y más de una hora de viaje. Los vecinos cuentan que los días de lluvia el colectivo no entra al barrio.',a:[
+['La salita de Las Retamas no tiene pediatra.','p','Lo dice el cartel con los profesionales y los horarios.'],
+['Los días de lluvia el colectivo no entra al barrio.','i','Es lo que cuentan los vecinos, pero no hay un registro oficial.'],
+['Llegar al pediatra más cercano lleva más de una hora y dos colectivos.','p','Se verifica en el recorrido oficial.'],
+['En la salita se puede sacar turno todos los días.','s','El cartel muestra que solo atiende tres mañanas por semana.']]},
+{t:'La casa y el ambiente',d:'Informe de la trabajadora social del hospital tras visitar la casa: seis personas en dos ambientes, paredes con humedad. Acta de la sociedad de fomento: el análisis de agua de pozo en tres casas del barrio dio «no apta para consumo»; no se analizó el pozo de la familia de Tomás. No hay red de agua corriente. Los vecinos comentan que tampoco llega el gas de red y que se calefaccionan con garrafa o brasero.',a:[
+['El agua de pozo analizada en el barrio no es apta para consumo.','p','Hay un resultado de laboratorio.'],
+['El pozo de la familia de Tomás también está contaminado.','i','Es probable, pero el análisis se hizo en otras casas, no en la suya.'],
+['En invierno calientan la casa con garrafa o brasero porque el barrio no tiene gas de red.','i','Es lo que cuentan los vecinos; no hay un registro oficial.'],
+['La humedad de la casa es porque la familia no la cuida.','s','Es un prejuicio: el informe describe la humedad sin atribuirla a descuido.']]},
+{t:'La comida y el trabajo',d:'Ficha social. El papá hace changas en la construcción y la mamá limpia casas por hora; ambos sin contrato ni obra social. Tomás almuerza en el comedor del barrio tres veces por semana (registro del comedor). La madre cuenta que hay días en que comen solo fideos o pan.',a:[
+['Tomás almuerza en el comedor del barrio tres veces por semana.','p','Está en el registro del comedor.'],
+['Hay días en que la familia come solo fideos o pan.','i','Es un relato de la madre, sin otro registro.'],
+['Los padres trabajan sin contrato y no tienen obra social.','p','Consta en la ficha social. Por eso dependen del hospital público.'],
+['Si comen mal es porque no saben administrar el dinero.','s','No hay ningún dato que lo sostenga; los ingresos irregulares explican mucho más.']]},
+{t:'El sistema',img:'sala.png',d:'Expediente del barrio: copias con sello de recepción de pedidos al municipio, de hace más de dos años, para tener un pediatra fijo, una ambulancia, insumos y reabrir la vieja sala de primeros auxilios (foto). Una nota sin firma ni número de expediente responde que «no hay presupuesto». Una vecina que trabajó en una clínica cuenta que quien tiene prepaga consigue pediatra en pocos días.',a:[
+['Los vecinos presentaron pedidos formales hace más de dos años, entre ellos reabrir la vieja sala de primeros auxilios.','p','Hay copias con sello de recepción.'],
+['El municipio respondió que no había presupuesto para sumar profesionales.','i','La nota no tiene firma ni número de expediente.'],
+['Quien tiene prepaga consigue pediatra en pocos días.','i','Se apoya en el testimonio de una vecina, no en datos.'],
+['La salita funciona bien, así que el barrio no necesita más servicios.','s','Lo contradicen los pedidos del barrio y la foto: la vieja sala está abandonada.']]}];
+const Q=[
+{q:'¿Qué factores intervinieron en lo que le pasó a Tomás?',m:1,o:[['Biológicos (la enfermedad y el bajo peso)',1],['Sociales (la distancia, la vivienda, el barrio)',1],['Económicos (el trabajo y los ingresos de la familia)',1],['Políticos (las decisiones y la falta de respuesta del Estado)',1],['Solo la decisión de la familia',-1]],e:'Intervinieron los cuatro primeros. La salud no es solo un problema biológico: también es social, económico y político.'},
+{q:'¿Qué derechos fueron vulnerados?',m:1,o:[['Derecho a la salud (Declaración Universal art. 25 y Convención sobre los Derechos del Niño art. 24, con jerarquía constitucional por el art. 75 inc. 22)',2],['Derecho a un ambiente sano (Constitución Nacional, art. 41)',2],['Derecho a la salud en la Constitución bonaerense (art. 36 inc. 8)',2],['Derecho a la huelga',-2],['Derecho del Estado a que cada familia se haga cargo sola de la salud de sus hijos',-2]],e:'Los tres primeros son correctos. La huelga no tiene relación con el caso. Y el último derecho no existe: el Estado no tiene ningún derecho a descargar su responsabilidad en las familias; tiene la obligación de garantizar el acceso a la salud. Los padres tienen deberes de cuidado, pero eso no reemplaza el deber del Estado, que además debe asistirlos.'},
+{q:'¿Quién es el primer responsable de garantizar el derecho a la salud?',o:[['La familia de Tomás',0],['El propio Tomás',0],['El mercado',0],['El Estado, en sus niveles nacional, provincial y municipal',10]],e:'El Estado es el garante principal. Durante mucho tiempo se pensó la salud como un asunto individual; hoy la Constitución y los tratados dicen que el Estado debe garantizarla.'},
+{q:'¿Qué consecuencias tiene la falta de acceso a la salud?',m:1,o:[['Se llega más tarde y más grave',1],['Se enferman personas por causas evitables',1],['Aumenta la desigualdad entre barrios y familias',1],['El hospital recibe casos más graves y se sobrecarga',1],['Ninguna, porque la salud es un tema individual',-1]],e:'Las cuatro primeras son consecuencias del caso. La falta de acceso afecta a toda la comunidad, no solo a una familia.'}];
+const MAX=64,S={};
+const ck=(n,s)=>{let h=0;for(const c of n+s)h=(h*31+c.charCodeAt(0))%26;return String.fromCharCode(65+h)};
+const clean=n=>n.toUpperCase().replace(/[^A-Z0-9ÁÉÍÓÚÑ ]/g,'').trim().slice(0,16);
+
+function home(){app(`<p class=k>Construcción de la Ciudadanía · 3.º C</p><h1>El caso de la salita</h1>
+<div class=doc>Tomás tiene 9 años y vive en el barrio Las Retamas, en las afueras de Mar del Plata. Ingresó a la guardia del hospital con una neumonía muy avanzada y bajo peso. Está internado, grave pero con posibilidades de recuperarse.</div>
+<p>Ustedes son el equipo de investigación y tienen que responder: <b>¿fue mala suerte, un descuido de la familia o hubo algo más?</b></p>
+<p>En cada pista hay un documento y cuatro afirmaciones. Clasifiquen cada una:</p>
+<p><b class=ok>Prueba</b>: está comprobada en el documento.<br><b style="color:var(--i)">Indicio</b>: es posible o viene de un relato, pero no está comprobada.<br><b class=no>Sin respaldo</b>: no hay dato que la sostenga o el documento la contradice.</p>
+<p>Un solo celular por grupo: discutan antes de elegir.</p>
+<label for=gn>Nombre del grupo</label><input type=text id=gn maxlength=16 autocomplete=off>
+<button class=btn id=go>Empezar la investigación</button>`);
+$('#go').onclick=()=>{const n=clean($('#gn').value);if(!n){$('#gn').focus();return}S.n=n;S.pp=[];pista(0)}}
+
+function pista(n){const p=P[n];
+app(`<p class=k>Pista ${n+1} de ${P.length}</p><h2>${p.t}</h2><div class=doc>${p.d}</div>${p.img?`<figure><img src="${p.img}" alt="Sala de primeros auxilios abandonada"><figcaption>Imagen ilustrativa</figcaption></figure>`:''}
+${p.a.map((a,j)=>`<div class=af><p>${a[0]}</p><div class=ops>${['p','i','s'].map(k=>`<label><input type=radio name=a${j} value=${k}><span>${L[k]}</span></label>`).join('')}</div><p class=fb id=f${j}></p></div>`).join('')}
+<button class=btn id=ok>Confirmar pista</button>`);
+let done=0;$('#ok').onclick=()=>{
+if(done){n<P.length-1?pista(n+1):concl();return}
+const v=p.a.map((a,j)=>{const c=document.querySelector(`input[name=a${j}]:checked`);return c&&c.value});
+if(v.includes(null)||v.includes(undefined)){$('#ok').textContent='Falta clasificar alguna afirmación';return}
+let t=0;p.a.forEach((a,j)=>{const g=v[j]==a[1]?2:(v[j]!='s'&&a[1]!='s'?1:0);t+=g;
+$('#f'+j).innerHTML=`<b class="${g==2?'ok':'no'}">${g==2?'Correcto':g?'Casi: era '+L[a[1]]:'Era '+L[a[1]]}.</b> ${a[2]}`});
+document.querySelectorAll('input').forEach(i=>i.disabled=true);S.pp[n]=t;done=1;
+$('#ok').textContent=n<P.length-1?'Siguiente pista':'Ir a la conclusión'}}
+
+function concl(){app(`<p class=k>Conclusión</p><h2>Armen el informe final</h2><p>Pueden marcar más de una opción cuando la pregunta lo indica.</p>
+${Q.map((q,i)=>`<div class="af q"><p>${q.q}</p>${q.o.map((o,j)=>`<label><input type=${q.m?'checkbox':'radio'} name=q${i} value=${j}>${o[0]}</label>`).join('')}<p class=fb id=e${i}></p></div>`).join('')}
+<button class=btn id=ok>Entregar el informe</button>`);
+$('#ok').onclick=()=>{let t=0,pc=[];Q.forEach((q,i)=>{let s=0;document.querySelectorAll(`input[name=q${i}]:checked`).forEach(c=>s+=q.o[c.value][1]);s=Math.max(0,s);pc.push(s);t+=s;$('#e'+i).innerHTML=`<b>+${s} puntos.</b> ${q.e}`});
+S.c=pc;S.t=S.pp.reduce((a,b)=>a+b,0)+t;document.querySelectorAll('input').forEach(i=>i.disabled=true);
+$('#ok').textContent='Ver resultado';$('#ok').onclick=fin}}
+
+function fin(){const c=`${S.n}-${S.t}-${ck(S.n,S.t)}`;
+app(`<p class=k>Grupo ${esc(S.n)}</p><h2>Informe entregado</h2><p class=big>${S.t}<span class=k> / ${MAX} puntos</span></p>
+<p>Pistas: ${S.pp.reduce((a,b)=>a+b,0)} de 40 · Conclusión: ${S.t-S.pp.reduce((a,b)=>a+b,0)} de 24</p>
+<p>Entreguen este código al docente:</p><div class=code>${esc(c)}</div>`)}
+
+/* Panel docente: abrir index.html#docente */
+const SL=[['El caso','Tomás, 9 años, barrio Las Retamas. ¿Fue mala suerte, descuido de la familia o hubo algo más?'],
+['1853','La Constitución original no menciona el derecho a la salud. Se lo consideraba un asunto individual.'],
+['1949','La reforma incorpora el derecho a la preservación de la salud y el Estado construye grandes hospitales.'],
+['1955','El golpe anula la reforma de 1949 y el derecho queda sin reconocimiento constitucional.'],
+['1994','La reforma incorpora el art. 41 (ambiente sano) y los tratados de derechos humanos (art. 75 inc. 22). El Estado pasa a ser garante.'],
+['La foto','Imagen ilustrativa: la vieja sala de primeros auxilios del barrio.','sala.png'],
+['Para pensar','Si el Estado es garante, ¿qué pasa cuando la salita atiende tres mañanas por semana?']];
+const G={};
+function docente(){document.body.classList.add('t');let k=0,tm;
+app(`<div class=sl id=sl></div><p class=k id=st style="margin-top:16px">Cuando cada grupo entregue su código, cárguenlo acá.</p>
+<div style="display:flex;gap:8px"><input type=text id=cd placeholder="Ej: DELFINES-52-K"><button class=btn id=add style="margin:0">Cargar</button></div>
+<p id=ls></p><button class=btn id=res>Mostrar resultados</button>`);
+const show=()=>{const s=SL[k%SL.length];$('#sl').innerHTML=`<h2>${s[0]}</h2><p>${s[1]}</p>${s[2]?`<img src="${s[2]}" alt="">`:''}`;k++};
+show();tm=setInterval(show,14000);
+const add=()=>{const m=$('#cd').value.trim().toUpperCase().match(/^(.+)-(\d+)-([A-Z])$/);
+if(!m||ck(m[1],m[2])!=m[3]||+m[2]>MAX){$('#st').textContent='Código no válido. Revisen que esté bien escrito.';return}
+G[m[1]]=+m[2];$('#cd').value='';$('#st').textContent='Código cargado.';$('#ls').textContent='Cargados ('+Object.keys(G).length+'): '+Object.keys(G).join(', ')};
+$('#add').onclick=add;$('#cd').onkeydown=e=>e.key=='Enter'&&add();
+$('#res').onclick=()=>{clearInterval(tm);const r=Object.entries(G).sort((a,b)=>b[1]-a[1]);
+if(!r.length){$('#st').textContent='Todavía no hay códigos cargados.';return}
+const d=r.length>1?r[0][1]-r[1][1]:0;
+app(`<h1>Resultados</h1>${r.map((x,i)=>`<div class="row ${i?'':'w'}"><b>${esc(x[0])}</b><i style="width:${x[1]/MAX*60}%"></i>${x[1]}</div>`).join('')}
+<h2>${r.length>1&&d?`Ganó ${esc(r[0][0])}, con ${d} ${d==1?'punto':'puntos'} de diferencia.`:r.length>1?'Hay empate en el primer puesto.':'Falta cargar más grupos.'}</h2>
+<button class="btn alt" id=bk>Volver</button>`);$('#bk').onclick=docente}}
+addEventListener('hashchange',()=>location.reload());
+location.hash=='#docente'?docente():home();
+</script></body></html>
