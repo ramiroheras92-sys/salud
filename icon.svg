@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" shape-rendering="crispEdges">
+  <rect width="512" height="512" rx="64" fill="#0f1226"/>
+  <path fill="#343b70" d="M64 48h384v16H64zM48 64h16v384H48zM448 64h16v384h-16zM64 448h384v16H64z"/>
+  <!-- Red medical cross -->
+  <path fill="#ff4057" d="M192 120h80v72h72v80h-72v72h-80v-72h-72v-80h72z"/>
+  <path fill="#ff7180" d="M200 128h64v72h72v64h-72v72h-64v-72h-72v-64h72z"/>
+  <!-- Pixel magnifying glass -->
+  <path fill="#050711" d="M328 88h64v16h32v32h16v80h-16v32h-32v16h-80v-16h-32v-32h-16v-80h16v-32h32v-16z"/>
+  <path fill="#4de3f0" d="M336 104h48v16h24v24h16v64h-16v24h-24v16h-64v-16h-24v-24h-16v-64h16v-24h24v-16z"/>
+  <path fill="#baf8ff" d="M336 120h32v16h-24v16h-16v32h-16v-48h16v-16h8z"/>
+  <path fill="#050711" d="M368 248h32v24h24v24h24v32h-24v24h-24v-24h-24v-24h-24v-32h16z"/>
+  <path fill="#ffd23f" d="M376 256h24v24h24v24h24v16h-16v24h-16v-24h-24v-24h-24v-24h8z"/>
+</svg>
