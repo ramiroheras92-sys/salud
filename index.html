@@ -15,6 +15,7 @@ h2{font-size:1.05rem;line-height:1.5;color:var(--ac);margin:.3em 0 .7em}
 .doc,.af,.sl,.code{background:var(--pn);border:4px solid #000;box-shadow:0 0 0 4px var(--ed),7px 7px 0 4px #000;margin:18px 4px}
 .doc{padding:14px 16px;border-left:14px solid var(--ac);font-size:26px}
 .af{padding:12px}.af>p:first-child{margin:0 0 10px;font-size:26px;color:#fff}
+.talk{border-left:10px solid var(--i);padding:10px 14px}.talk p{margin:6px 0}.talk .source{color:var(--mut);font-size:22px}.ask{display:block;width:100%;text-align:left;margin:10px 0;line-height:1.45}.ask:disabled{background:#2a2f5c;color:var(--mut);box-shadow:none;cursor:default;transform:none}
 figure{margin:18px 4px}img{max-width:100%;display:block;border:4px solid #000;box-shadow:0 0 0 4px var(--ed)}figcaption{color:var(--mut)}
 .ops{display:flex;gap:8px;flex-wrap:wrap}.ops label{flex:1;min-width:96px}.ops input{position:absolute;opacity:0}
 .ops span{display:block;text-align:center;padding:12px 4px;border:4px solid #000;background:#2a2f5c;font-size:.55rem;line-height:1.4;cursor:pointer}
@@ -27,6 +28,8 @@ input[value=p]:checked+span{background:var(--p)}input[value=i]:checked+span{back
 input[type=text]{font:28px VT323,monospace;padding:8px 10px;border:4px solid #000;box-shadow:0 0 0 4px var(--ed);width:100%;background:#0a0c1c;color:var(--p)}
 label[for]{display:block;margin:14px 0 8px}
 .q label{display:block;padding:6px 0;cursor:pointer}.q input{margin-right:10px;transform:scale(1.4)}
+label.q{display:block;padding:10px 12px;margin:10px 4px;background:var(--pn);border-left:6px solid var(--ac);line-height:1.45}
+.doc ol{padding-left:1.3em}.doc li{margin:8px 0}
 .pg{display:flex;gap:6px;margin:6px 4px 12px}.pg i{flex:1;height:16px;background:#2a2f5c;border:3px solid #000}.pg i.on{background:var(--ac)}
 .big{font-size:2rem;margin:.4em 0;color:var(--p)}
 .code{font-size:.85rem;text-align:center;padding:16px;color:var(--i);word-break:break-all}
@@ -44,7 +47,7 @@ const P=[
 {t:'La historia clínica',d:'Ficha de ingreso a guardia. Paciente: Tomás, 9 años. Diagnóstico: neumonía avanzada. Peso: por debajo del esperado para su edad. Relato de la madre: tos desde hace unas tres semanas. Observación: sin controles de salud registrados en el último año.',a:[
 ['Tomás ingresó con neumonía avanzada y bajo peso para su edad.','p','Figura en el diagnóstico médico.'],
 ['La tos empezó hace unas tres semanas.','i','Surge del relato de la madre: es un dato referido, no comprobado por un estudio.'],
-['No hay controles de salud registrados en el último año.','p','Está anotado en la ficha.'],
+['Tomás no tuvo ningún control de salud durante el último año.','i','En la historia clínica de este hospital no aparecen controles, pero eso no descarta que lo hayan atendido en otro lugar.'],
 ['Si la mamá lo hubiera llevado antes, no habría pasado nada.','s','Nadie puede asegurarlo, y todavía no sabemos si la familia podía llevarlo. Culpar sin pruebas no es investigar.']]},
 {t:'El barrio y la distancia',d:'Cartel de la salita de Las Retamas: atiende lunes, miércoles y viernes por la mañana, con una enfermera y un médico clínico. No hay pediatra. Los turnos se entregan a las 7 y se agotan rápido. Recorrido oficial al pediatra más cercano: dos colectivos y más de una hora de viaje. Los vecinos cuentan que los días de lluvia el colectivo no entra al barrio.',a:[
 ['La salita de Las Retamas no tiene pediatra.','p','Lo dice el cartel con los profesionales y los horarios.'],
@@ -78,7 +81,7 @@ const clean=n=>n.toUpperCase().replace(/[^A-Z0-9ÁÉÍÓÚÑ ]/g,'').trim().slic
 function home(){app(`<p class=k>Expediente Las Retamas · Construcción de la Ciudadanía 3.º C</p><h1>El caso de la salita</h1>
 <div class=doc>Tomás tiene 9 años y vive en el barrio Las Retamas, en las afueras de Mar del Plata. Ingresó a la guardia del hospital con una neumonía muy avanzada y bajo peso. Está internado, grave pero con posibilidades de recuperarse.</div>
 <p>Ustedes son el equipo de investigación y tienen que responder: <b>¿fue mala suerte, un descuido de la familia o hubo algo más?</b></p>
-<p>En cada pista hay un documento y cuatro afirmaciones. Clasifiquen cada una:</p>
+<p>En cada pista, elijan qué quieren preguntar. Reúnan todas las respuestas y después clasifiquen las afirmaciones:</p>
 <p><b class=ok>Prueba</b>: está comprobada en el documento.<br><b style="color:var(--i)">Indicio</b>: es posible o viene de un relato, pero no está comprobada.<br><b class=no>Sin respaldo</b>: no hay dato que la sostenga o el documento la contradice.</p>
 <div class=doc><b>Misión:</b> averigüen qué condiciones llevaron a Tomás a la guardia y preparen tres propuestas para presentar en una audiencia del barrio. Al final tendrán que fundamentarlas con las pistas y los testimonios.</div>
 <p>Un solo celular por grupo: discutan antes de elegir.</p>
@@ -86,8 +89,18 @@ function home(){app(`<p class=k>Expediente Las Retamas · Construcción de la Ci
 <button class=btn id=go>Empezar la investigación</button>`);
 $('#go').onclick=()=>{const n=clean($('#gn').value),r=$('#rl').value;if(!n){$('#gn').focus();return}if(r===''){$('#rl').focus();return}S.n=n;S.r=+r;S.pp=[];S.kp=[0,0,0,0];S.q=0;S.c=0;pista(0)}}
 
-function pista(n){const p=P[n];
-app(`<div class=pg>${P.map((_,i)=>`<i class="${i<=n?'on':''}"></i>`).join('')}</div><p class=k>Pista ${n+1} de ${P.length}</p><h2>${p.t}</h2><div class=doc>${p.d}</div>${p.img?`<figure><img src="${p.img}" alt="Sala de primeros auxilios abandonada"><figcaption>Imagen ilustrativa</figcaption></figure>`:''}
+const D=[
+[{q:'¿Qué sabemos sobre el estado de Tomás al llegar?',who:'Médica de guardia',a:'Ingresó con neumonía avanzada y un peso por debajo de lo esperado para su edad.',src:'Diagnóstico y examen registrados en la ficha de ingreso.'},{q:'¿Cuándo habría empezado la tos?',who:'Médica de guardia',a:'La mamá calculó que hacía unas tres semanas. No tenemos una fecha exacta ni un estudio que confirme ese comienzo.',src:'Relato de la madre anotado durante la consulta.'},{q:'¿Tuvo controles de salud durante el último año?',who:'Médica de guardia',a:'En esta historia clínica no veo controles anotados. Eso no me permite saber si lo atendieron en otro centro.',src:'Registro del hospital; no incluye necesariamente consultas en otros lugares.'}],
+[{q:'¿Qué atención ofrece la salita?',who:'Administrativa de la salita',a:'Abrimos lunes, miércoles y viernes por la mañana. Hay una enfermera y un médico clínico; pediatra no tenemos.',src:'Cartel de horarios y profesionales.'},{q:'¿Cómo se consiguen los turnos?',who:'Vecina del barrio',a:'Los entregan a las siete. Si llegás un poco después, muchas veces ya se terminaron.',src:'Testimonio vecinal; no hay un registro de turnos disponibles.'},{q:'¿Qué tan lejos queda el pediatra más cercano?',who:'Investigadora del equipo',a:'El recorrido oficial indica dos colectivos y más de una hora. Los vecinos agregan que, cuando llueve, el colectivo a veces no entra al barrio.',src:'Recorrido oficial y testimonio vecinal: son dos fuentes distintas.'}],
+[{q:'¿Qué observó en la casa de Tomás?',who:'Trabajadora social',a:'Viven seis personas en dos ambientes y observé humedad en las paredes.',src:'Informe escrito después de la visita domiciliaria.'},{q:'¿Se analizó el agua que consume la familia?',who:'Integrante de la sociedad de fomento',a:'El laboratorio encontró agua no apta para consumo en tres casas del barrio, pero no tomó una muestra del pozo de Tomás.',src:'Acta con resultados de tres pozos; el de la familia no fue analizado.'},{q:'¿Cómo se calefaccionan en invierno?',who:'Vecina del barrio',a:'Acá no llega el gas de red. Muchas familias usan garrafa o brasero.',src:'Testimonio vecinal; no es un relevamiento de todos los hogares.'}],
+[{q:'¿De qué trabajan los padres?',who:'Trabajadora social',a:'El papá hace changas en construcción y la mamá limpia casas por hora. Ninguno tiene contrato ni obra social.',src:'Datos asentados en la ficha social.'},{q:'¿Tomás recibe alguna comida en el barrio?',who:'Responsable del comedor',a:'Almuerza acá tres veces por semana; lo anotamos cada día que viene.',src:'Registro de asistencia del comedor.'},{q:'¿Qué comen los otros días?',who:'Madre de Tomás',a:'Hay días en que comemos fideos o pan. Depende de cómo venga el trabajo esa semana.',src:'Testimonio de la madre; no hay otro registro de las comidas.'}],
+[{q:'¿Qué pedidos hicieron los vecinos?',who:'Investigadora del equipo',a:'Piden un pediatra fijo, una ambulancia, insumos y que vuelva a abrir la vieja sala de primeros auxilios.',src:'Copias de notas con sello de recepción municipal, presentadas hace más de dos años.'},{q:'¿Hubo una respuesta oficial?',who:'Vecina del barrio',a:'Circula una nota que dice “no hay presupuesto”, pero no tiene firma ni número de expediente.',src:'Nota sin datos que permitan confirmar quién la emitió.'},{q:'¿La cobertura privada cambia el acceso?',who:'Vecina que trabajó en una clínica',a:'Por lo que vi, quienes tienen prepaga consiguen pediatra en pocos días.',src:'Experiencia personal; no es una estadística.'}]];
+function pista(n){const p=P[n],qs=D[n],hechas=new Set();
+app(`<div class=pg>${P.map((_,i)=>`<i class="${i<=n?'on':''}"></i>`).join('')}</div><p class=k>Pista ${n+1} de ${P.length}</p><h2>${p.t}</h2><div class=doc>Elijan una pregunta para empezar. Pueden hacerlas todas y en el orden que quieran; cada respuesta se suma al expediente.</div>${p.img?`<figure><img src="${p.img}" alt="Sala de primeros auxilios abandonada"><figcaption>Imagen del expediente</figcaption></figure>`:''}<div id=log aria-live=polite></div><div id=asks>${qs.map((x,j)=>`<button class="btn alt ask" data-q="${j}">${x.q}</button>`).join('')}</div><p class=fb id=progress>Preguntas realizadas: 0 de ${qs.length}</p><button class=btn id=next disabled>Revisar afirmaciones</button>`);
+document.querySelectorAll('.ask').forEach(b=>b.onclick=()=>{const j=+b.dataset.q,x=qs[j];if(hechas.has(j))return;hechas.add(j);$('#log').insertAdjacentHTML('beforeend',`<div class="af talk"><p><b>Pregunta:</b> ${x.q}</p><p><b>${x.who}:</b> ${x.a}</p><p class=source><b>Fuente:</b> ${x.src}</p></div>`);b.disabled=true;b.textContent='✓ '+x.q;$('#progress').textContent=`Preguntas realizadas: ${hechas.size} de ${qs.length}`;if(hechas.size===qs.length)$('#next').disabled=false});
+$('#next').onclick=()=>clasificar(n)}
+function clasificar(n){const p=P[n];
+app(`<div class=pg>${P.map((_,i)=>`<i class="${i<=n?'on':''}"></i>`).join('')}</div><p class=k>Pista ${n+1} de ${P.length} · Expediente completo</p><h2>${p.t}</h2><p>Con todas las respuestas reunidas, clasifiquen cada afirmación según la evidencia disponible.</p>
 ${p.a.map((a,j)=>`<div class=af><p>${a[0]}</p><div class=ops>${['p','i','s'].map(k=>`<label><input type=radio name=a${j} value=${k}><span>${L[k]}</span></label>`).join('')}</div><p class=fb id=f${j}></p></div>`).join('')}
 <button class=btn id=ok>Confirmar pista</button>`);
 let done=0;$('#ok').onclick=()=>{
@@ -127,21 +140,21 @@ const lock=()=>document.querySelectorAll('input').forEach(i=>i.disabled=true);
 function ronda(){app(`<p class=k>Ronda de testimonios</p><h2>${R[S.r][0]}</h2><div class=doc>${R[S.r][1]}</div><p>Este testimonio es solo de ustedes: no muestren la pantalla. Cuéntenlo en voz alta a los demás grupos y averigüen los otros cinco hablando con ellos.</p><button class=btn id=ok>Ya hablamos con todos</button>`);$('#ok').onclick=cruce}
 function cruce(){app(`<p class=k>Preguntas de cruce</p><h2>¿Qué dijeron los testigos?</h2>${CR.map((c,i)=>`<div class="af q"><p>${c[0]}</p>${c[1].map((o,j)=>`<label><input type=radio name=c${i} value=${j}>${o}</label>`).join('')}<p class=fb id=c${i}></p></div>`).join('')}<button class=btn id=ok>Confirmar respuestas</button>`);
 let d=0;$('#ok').onclick=()=>{if(d){etapa(0);return}S.c=0;CR.forEach((c,i)=>{const v=document.querySelector(`input[name=c${i}]:checked`),g=v&&+v.value==c[2];if(g)S.c+=2;$('#c'+i).innerHTML=g?'<b class=ok>Correcto (+2).</b>':'<b class=no>Era: '+c[1][c[2]]+'.</b>'});lock();d=1;$('#ok').textContent='Continuar'}}
-function etapa(i){if(i==4){blk([Q[3]],audiencia,'Cierre');return}llave(i,()=>blk(I[i],()=>etapa(i+1),'Instancia '+(i+1)+' de 4'))}
-function llave(i,nx){const k=K[i];let n=0;
+function etapa(i){if(i==4){blk([Q[3]],audiencia,'Cierre');return}llave(i,()=>blk(I[i],()=>etapa(i+1),'Instancia '+(i+1)+' de 4'),()=>etapa(i+1))}
+function llave(i,nx,skip){const k=K[i];let n=0,fallo=false;
 app(`<p class=k>Llave ${i+1} de 4</p><h2>Consigan la norma</h2><div class=doc>${k[0]}</div><input type=text id=ky autocomplete=off><p class=fb id=kf></p><button class=btn id=ok>Probar llave</button>`);
-$('#ok').onclick=()=>{if(n<0){nx();return}const a=nz($('#ky').value),f=$('#kf');if(!a)return;n++;const ok=k[1].includes(a);
-if(ok||n>=3){S.kp[i]=ok?(n==1?2:n==2?1:0):0;f.innerHTML=(ok?`<b class=ok>Llave abierta (+${S.kp[i]}).</b>`:`<b class=no>Se agotaron los intentos (+0). La respuesta era ${k[1][0].toLowerCase()}.</b>`)+`<br>Lo que dice la norma: ${k[3]}`;$('#ky').disabled=true;$('#ok').textContent='Abrir la instancia';n=-1}
+$('#ok').onclick=()=>{if(n<0){fallo?skip():nx();return}const a=nz($('#ky').value),f=$('#kf');if(!a)return;n++;const ok=k[1].includes(a);
+if(ok||n>=3){fallo=!ok;S.kp[i]=ok?(n==1?2:n==2?1:0):0;f.innerHTML=(ok?`<b class=ok>Llave abierta (+${S.kp[i]}).</b>`:`<b class=no>Se agotaron los intentos. Esta instancia queda sin resolver y suma 0 puntos.</b>`)+`<br>Respuesta: ${k[1][0].toLowerCase()}. ${k[3]}`;$('#ky').disabled=true;$('#ok').textContent=ok?'Abrir la instancia':'Perder esta oportunidad y continuar';n=-1}
 else f.innerHTML=`<b class=no>No es esa. Intento ${n} de 3.</b> ${n>1?k[2]:''}`}}
 function blk(qs,nx,tt){app(`<p class=k>${tt}</p><h2>Respondan con lo que aprendieron</h2>${qs.map((q,i)=>`<div class="af q"><p>${q.q}</p>${q.o.map((o,j)=>`<label><input type=${q.m?'checkbox':'radio'} name=q${i} value=${j}>${o[0]}</label>`).join('')}<p class=fb id=e${i}></p></div>`).join('')}<button class=btn id=ok>Confirmar respuestas</button>`);
 let d=0;$('#ok').onclick=()=>{if(d){nx();return}qs.forEach((q,i)=>{let s=0;document.querySelectorAll(`input[name=q${i}]:checked`).forEach(c=>s+=q.o[c.value][1]);s=Math.max(0,s);S.q+=s;$('#e'+i).innerHTML=`<b>+${s} puntos.</b> ${q.e}`});lock();d=1;$('#ok').textContent='Continuar'}}
 const MEDIDAS=['Sumar un pediatra y ampliar los días de atención en la salita.','Crear un sistema de derivación y seguimiento entre la salita y el hospital.','Mejorar la respuesta de ambulancias para el barrio.','Garantizar agua potable y controles de calidad en los pozos.','Acordar responsabilidades y plazos entre municipio y Provincia.','Acompañar a las familias con asistencia y educación para la salud.'];
 function audiencia(){app(`<p class=k>Audiencia del barrio · decisión final</p><h2>¿Qué debería cambiar?</h2><div class=doc>Elijan tres medidas para presentar en una audiencia. No hay una única combinación correcta: preparen argumentos con las pistas, los testimonios y las normas que investigaron.</div><p><b>Elijan tres prioridades:</b></p>${MEDIDAS.map((m,i)=>`<label class="q"><input type=checkbox name=med value=${i}> ${m}</label>`).join('')}<label for=arg>Escriban una justificación breve: ¿qué evidencia respalda su prioridad y a quién ayudaría?</label><textarea id=arg rows=4 maxlength=360 style="font:26px VT323,monospace;padding:10px;border:4px solid #000;box-shadow:0 0 0 4px var(--ed);width:100%;background:#0a0c1c;color:var(--p)"></textarea><p class=fb id=af></p><button class=btn id=ok>Preparar informe</button>`);
 $('#ok').onclick=()=>{const ms=[...document.querySelectorAll('input[name=med]:checked')].map(x=>+x.value),arg=$('#arg').value.trim();if(ms.length!==3){$('#af').textContent='Elijan exactamente tres medidas para continuar.';return}if(arg.length<20){$('#af').textContent='Agreguen una justificación de al menos una oración.';$('#arg').focus();return}S.med=ms;S.arg=arg;fin()}}
-function fin(){const a=S.pp.reduce((x,y)=>x+y,0),b=S.kp.reduce((x,y)=>x+y,0);S.t=a+b+S.c+S.q;const c=`${S.n}-${S.t}-${ck(S.n,S.t)}`;
+function fin(){const a=S.pp.reduce((x,y)=>x+y,0),b=S.kp.reduce((x,y)=>x+y,0);S.t=a+b+S.c+S.q;const ms=S.med.map(i=>i+1).join(''),c=`${S.n}-${S.t}-${ms}-${ck(S.n,S.t+ms)}`;
 app(`<p class=k>Grupo ${esc(S.n)} · audiencia del barrio</p><h2>Informe listo para presentar</h2><div class=doc><b>Prioridades elegidas</b><ol>${(S.med||[]).map(i=>`<li>${MEDIDAS[i]}</li>`).join('')}</ol><b>Fundamentación</b><p>${esc(S.arg||'')}</p></div><p>Presenten este informe en voz alta en un minuto. Citen al menos una pista o testimonio y expliquen por qué las medidas elegidas ayudarían a que otros chicos no lleguen a la guardia en la misma situación.</p><p class=big>${S.t}<span class=k> / ${MAX} puntos</span></p>
 <p>Pistas: ${a} de 40 · Llaves: ${b} de 8 · Testimonios: ${S.c} de 12 · Instancias: ${S.q} de 39</p>
-<p>Entreguen este código al docente:</p><div class=code>${esc(c)}</div>`)}
+<p>Entreguen este código al docente. Incluye sus tres propuestas:</p><div class=code>${esc(c)}</div>`)}
 
 /* Panel docente: abrir index.html#docente */
 const SL=[['El caso','Tomás, 9 años, barrio Las Retamas. ¿Fue mala suerte, descuido de la familia o hubo algo más?'],
@@ -154,18 +167,18 @@ const SL=[['El caso','Tomás, 9 años, barrio Las Retamas. ¿Fue mala suerte, de
 const G={};
 function docente(){document.body.classList.add('t');let k=0,tm;
 const lst=()=>{if(Object.keys(G).length)$('#ls').textContent='Cargados ('+Object.keys(G).length+'): '+Object.keys(G).join(', ')};
-app(`<h1>Panel docente</h1><form id=fm style="display:flex;gap:12px;align-items:center"><input type=text id=cd placeholder="NOMBRE-52-K" autocomplete=off autocapitalize=characters><button class=btn style="margin:0">Cargar</button></form>
+app(`<h1>Panel docente</h1><form id=fm style="display:flex;gap:12px;align-items:center"><input type=text id=cd placeholder="NOMBRE-52-135-K" autocomplete=off autocapitalize=characters><button class=btn style="margin:0">Cargar</button></form>
 <p id=st class=k>Escriban el código de cada grupo y presionen Cargar.</p><p id=ls></p><div class=doc style="font-size:21px">Roles para repartir: ${R.map((r,i)=>(i+1)+". "+r[0]).join(" · ")}</div><button class=btn id=res>Mostrar resultados</button><div class=sl id=sl></div>`);lst();
 const show=()=>{const s=SL[k%SL.length];$('#sl').innerHTML=`<h2>${s[0]}</h2><p>${s[1]}</p>${s[2]?`<img src="${s[2]}" alt="">`:''}`;k++};
 show();tm=setInterval(show,14000);
-$('#fm').onsubmit=e=>{e.preventDefault();const st=$('#st'),m=$('#cd').value.toUpperCase().replace(/[\u2010-\u2015\u2212]/g,'-').replace(/\s*-\s*/g,'-').trim().match(/^(.+)-(\d+)-([A-Z])$/);
-if(!m){st.textContent='Formato esperado: NOMBRE-PUNTOS-LETRA, por ejemplo DELFINES-52-K.';st.className='k no';return}
-if(ck(m[1],m[2])!=m[3]||+m[2]>MAX){st.textContent='La letra final no coincide con el nombre y el puntaje. Revisen cómo está escrito el código.';st.className='k no';return}
-G[m[1]]=+m[2];$('#cd').value='';st.textContent='Código cargado: '+m[1]+' ('+m[2]+' puntos).';st.className='k ok';lst()};
-$('#res').onclick=()=>{const r=Object.entries(G).sort((a,b)=>b[1]-a[1]);
+$('#fm').onsubmit=e=>{e.preventDefault();const st=$('#st'),m=$('#cd').value.toUpperCase().replace(/[\u2010-\u2015\u2212]/g,'-').replace(/\s*-\s*/g,'-').trim().match(/^(.+)-(\d+)-([1-6]{3})-([A-Z])$/);
+if(!m||new Set(m[3]).size!==3){st.textContent='Formato esperado: NOMBRE-PUNTOS-123-LETRA (los tres dígitos representan las propuestas).';st.className='k no';return}
+if(ck(m[1],m[2]+m[3])!=m[4]||+m[2]>MAX){st.textContent='El código no coincide con el nombre, puntaje y propuestas. Revisen cómo está escrito.';st.className='k no';return}
+G[m[1]]={score:+m[2],med:[...m[3]].map(Number)};$('#cd').value='';st.textContent='Código cargado: '+m[1]+' ('+m[2]+' puntos).';st.className='k ok';lst()};
+$('#res').onclick=()=>{const r=Object.entries(G).sort((a,b)=>b[1].score-a[1].score);
 if(!r.length){$('#st').textContent='Todavía no hay códigos cargados.';$('#st').className='k no';return}
-clearInterval(tm);const d=r.length>1?r[0][1]-r[1][1]:0;
-app(`<h1>Resultados</h1>${r.map((x,i)=>`<div class="row ${i?'':'w'}"><b>${esc(x[0])}</b><i style="width:${x[1]/MAX*55}%"></i>${x[1]}</div>`).join('')}
+clearInterval(tm);const d=r.length>1?r[0][1].score-r[1][1].score:0;
+app(`<h1>Resultados</h1>${r.map((x,i)=>`<div class="row ${i?'':'w'}"><b>${esc(x[0])}</b><i style="width:${x[1].score/MAX*55}%"></i>${x[1].score}</div><div class=doc><b>Propuestas de ${esc(x[0])}:</b><ol>${x[1].med.map(m=>`<li>${MEDIDAS[m-1]}</li>`).join('')}</ol></div>`).join('')}
 <h2>${r.length>1&&d?`Ganó ${esc(r[0][0])}, con ${d} ${d==1?'punto':'puntos'} de diferencia.`:r.length>1?'Hay empate en el primer puesto.':'Falta cargar más grupos.'}</h2>
 <button class="btn alt" id=bk>Volver</button>`);$('#bk').onclick=docente}}
 addEventListener('hashchange',()=>location.reload());
